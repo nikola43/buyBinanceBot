@@ -10,7 +10,7 @@ secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
 
-selectedSymbol = "XLM" + "BTC"
+selectedSymbol = "FLM" + "BTC"
 selectedSymbolLastPrice = 0
 selectedSymbolBidPrice = 0
 selectedSymbolAskPrice = 0
@@ -163,7 +163,7 @@ if __name__ == "__main__":
             selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolLastPrice, takeProfitPercent)
 
         # TAKE PROFIT UPDATE
-        if selectedSymbolBidPrice > selectedSymbolLastPrice and selectedSymbolLastPrice > selectedSymbolInitialBuyPrice:
+        if selectedSymbolBidPrice > selectedSymbolLastPrice and selectedSymbolBidPrice > selectedSymbolInitialBuyPrice:
             selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
             selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolBidPrice, takeProfitPercent)
             print(stylize("New price target: " + str(selectedSymbolBidPrice), colored.fg("yellow")))

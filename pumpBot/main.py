@@ -4,13 +4,14 @@ import time
 import colored
 from colored import stylize
 from decimal import *
+import sys
 
 apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
 secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
 
-selectedSymbol = "FLM" + "BTC"
+selectedSymbol = sys.argv[1].upper() + "BTC"
 selectedSymbolLastPrice = 0
 selectedSymbolBidPrice = 0
 selectedSymbolAskPrice = 0
@@ -21,7 +22,7 @@ selectedSymbolStopLossPrice = 0
 selectedSymbolInitialBuyPrice = 0
 btcBalance = 0
 selectedSymbolBalance = 0
-stopLossPercent = 5
+stopLossPercent = 3
 takeProfitPercent = 1
 
 

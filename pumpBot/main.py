@@ -75,7 +75,7 @@ def print_stop_loss_result(quantity, sell_price):
     print(stylize("Quantity: " + str(quantity), colored.fg("red")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("red")))
     print(stylize(
-        "Loss:" + str(float(quantity) * float(sell_price)) + " BTC",
+        "Loss: " + str(float(quantity) * float(sell_price)) + " BTC",
         colored.fg("red")))
     print("")
 

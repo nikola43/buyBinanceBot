@@ -1,0 +1,81 @@
+    # get symbol info
+    symbol_info = client.get_symbol_info(selectedSymbol)
+
+    # get initial price
+    tickers = client.get_orderbook_tickers()
+    selectedSymbolPrices = get_symbol_ask_bid_price(tickers, selectedSymbol)
+    selectedSymbolBidPrice = selectedSymbolPrices["bid_price"]
+    selectedSymbolAskPrice = selectedSymbolPrices["ask_price"]
+
+    # get symbol minimum lot size and minimum notional
+    selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
+    selectedSymbolMinNotional = get_symbol_minimum_notional(symbol_info)
+
+    # print(selectedSymbolMinLotSize)
+    # print(selectedSymbolMinNotional)
+    # print(tickers)
+
+    # GET BTC AND SELECTED SYMBOL BALANCE
+    btcBalance = get_btc_balance(client)
+    selectedSymbolBalance = get_symbol_balance(client, selectedSymbol)
+    btcBalance = btcBalance / 20  # 2% usable
+
+    print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
+    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
+    print("")
+
+    q = round(calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) - (
+            calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) * Decimal(0.1)) / 100, 0)
+    order = client.order_market_buy(symbol=selectedSymbol, quantity=q)
+    selectedSymbolInitialBuyPrice = round(Price.fromstring(order["fills"][0]["price"]).amount, 8)
+
+    btcBalance = get_btc_balance(client)
+    selectedSymbolBalance = get_symbol_balance(client, selectedSymbol)
+    print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
+    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
+    print("")
+
+    print(stylize("Selected Symbol Initial Buy Price: " + str(selectedSymbolInitialBuyPrice), colored.fg("green")))
+
+
+
+
+
+
+tickers = client.get_orderbook_tickers()
+        selectedSymbolPrices = get_symbol_ask_bid_price(tickers, selectedSymbol)
+        selectedSymbolBidPrice = selectedSymbolPrices["bid_price"]
+        selectedSymbolAskPrice = selectedSymbolPrices["ask_price"]
+
+        # SET STOP LOSS
+        if selectedSymbolLastPrice == 0:
+            selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
+            selectedSymbolStopLossPrice = calculate_calculate_percent_price(selectedSymbolLastPrice, stopLossPercent)
+            selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolLastPrice, takeProfitPercent)
+
+        # TAKE PROFIT UPDATE
+        if selectedSymbolBidPrice > selectedSymbolLastPrice and selectedSymbolBidPrice > selectedSymbolInitialBuyPrice:
+            selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
+            selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolBidPrice, takeProfitPercent)
+            print(stylize("New price target: " + str(selectedSymbolBidPrice), colored.fg("yellow")))
+
+        print_current_status(selectedSymbolBidPrice, selectedSymbolAskPrice, selectedSymbolSellPrice,
+                             selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice)
+
+        # STOP LOSS SELL
+        if selectedSymbolBidPrice <= selectedSymbolStopLossPrice:
+            quantity = calculate_quantity(selectedSymbolBalance, selectedSymbolMinLotSize)
+            # order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
+            print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
+            break
+
+        # TAKE PROFIT SELL
+        if selectedSymbolBidPrice <= selectedSymbolSellPrice:
+            if selectedSymbolBidPrice > selectedSymbolInitialBuyPrice:
+                quantity = calculate_quantity(selectedSymbolBalance, selectedSymbolMinLotSize)
+                # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
+                print_take_profit_result(quantity, selectedSymbolSellPrice)
+                break
+
+        selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
+        time.sleep(0.5)

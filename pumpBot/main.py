@@ -5,33 +5,18 @@ import colored
 from colored import stylize
 from decimal import *
 import sys
-
-apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
-secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
-
-client = Client(apikey, secret)
-
-selectedSymbol = sys.argv[1].upper() + "BTC"
-selectedSymbolLastPrice = 0
-selectedSymbolBidPrice = 0
-selectedSymbolAskPrice = 0
-selectedSymbolSellPrice = 0
-selectedSymbolMinLotSize = 0
-selectedSymbolMinNotional = 0
-selectedSymbolStopLossPrice = 0
-selectedSymbolInitialBuyPrice = 0
-btcBalance = 0
-selectedSymbolBalance = 0
-stopLossPercent = 3
-takeProfitPercent = 1
+import math
 
 
 def calculate_percent(value, percent):
     return (value * percent) / 100
 
 
-def calculate_max_buy_quantity(price, balance):
-    return balance / price
+def calculate_max_buy_quantity(price, balance, lot_size):
+    precision = 2
+    if lot_size == '1.00000000':
+        precision = 0
+    return round(balance / price, precision)
 
 
 def calculate_calculate_percent_price(price, percent):
@@ -57,20 +42,20 @@ def get_symbol_minimum_notional(symbol_info):
 
 
 def get_btc_balance(client):
-    return Price.fromstring(client.get_asset_balance(asset='BTC')["free"]).amount
+    return round(Price.fromstring(client.get_asset_balance(asset='BTC')["free"]).amount, 8)
 
 
-def get_symbol_balance(client, symbol_name):
-    return Price.fromstring(client.get_asset_balance(asset=get_symbol_name(symbol_name))["free"]).amount
+def get_symbol_balance(client, symbol_name, base_asset_precision):
+    return round(Price.fromstring(client.get_asset_balance(asset=get_symbol_name(symbol_name))["free"]).amount,
+                 base_asset_precision)
 
 
-def get_symbol_ask_bid_price(tickers, symbol_name):
+def get_symbol_ask_bid_price(tickers, symbol_name, base_asset_precision):
     for item in tickers:
-        symbol = item['symbol']
-        if symbol == symbol_name:
+        if item['symbol'] == symbol_name:
             ask_bid_price = {
-                "bid_price": round(Price.fromstring(item['bidPrice']).amount, 8),
-                "ask_price": round(Price.fromstring(item['askPrice']).amount, 8)
+                "bid_price": round(Price.fromstring(item['bidPrice']).amount, base_asset_precision),
+                "ask_price": round(Price.fromstring(item['askPrice']).amount, base_asset_precision)
             }
             return ask_bid_price
 
@@ -95,12 +80,12 @@ def print_stop_loss_result(quantity, sell_price):
     print("")
 
 
-def print_current_status(bid_price, ask_price, sell_price, stop_loss_price, initial_buy_price):
-    print(stylize("Buy Price: " + str(bid_price), colored.fg("green")))
-    print(stylize("Sell Price: " + str(ask_price), colored.fg("red")))
+def print_current_status(price, high_price, stop_loss_price, initial_buy_price, take_profit_price):
+    print(stylize("Current Price: " + str(price), colored.fg("green")))
+    print(stylize("High Price: " + str(high_price), colored.fg("green")))
     print(stylize("Stop Loss Price: " + str(stop_loss_price), colored.fg("yellow")))
     print(stylize("Selected Symbol Initial Buy Price: " + str(initial_buy_price), colored.fg("green")))
-    print(stylize("selectedSymbolSellPrice: " + str(sell_price), colored.fg("blue")))
+    print(stylize("selectedSymbolSellPrice: " + str(take_profit_price), colored.fg("blue")))
     print("")
 
 
@@ -111,81 +96,150 @@ def calculate_quantity(symbol_balance, lot_size):
         return round(symbol_balance - (symbol_balance * Decimal(0.1) / 100), 8)
 
 
+def floatPrecision(f, n):
+    n = int(math.log10(1 / float(n)))
+    f = math.floor(float(f) * 10 ** n) / 10 ** n
+    f = "{:0.0{}f}".format(float(f), n)
+    return str(int(f)) if int(n) == 0 else f
+
+
+apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
+secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
+
+client = Client(apikey, secret)
+selectedSymbolName = "comp"
+selectedSymbol = selectedSymbolName.upper() + "BTC"
+# selectedSymbol = sys.argv[1].upper() + "BTC"
+selectedSymbolLastPrice = 0.0
+selectedSymbolBidPrice = 0.0
+selectedSymbolAskPrice = 0.0
+selectedSymbolSellPrice = 0.0
+selectedSymbolMinLotSize = 0.0
+selectedSymbolMinNotional = 0.0
+selectedSymbolStopLossPrice = 0.0
+selectedSymbolInitialBuyPrice = 0.0
+btcBalance = 0.0
+selectedSymbolBalance = 0.0
+stopLossPercent = 1  # 3%
+takeProfitPercent = 1  # 1%
+baseAssetPrecision = 0.0
+
 if __name__ == "__main__":
     # get symbol info
     symbol_info = client.get_symbol_info(selectedSymbol)
-
-    # get initial price
-    tickers = client.get_orderbook_tickers()
-    selectedSymbolPrices = get_symbol_ask_bid_price(tickers, selectedSymbol)
-    selectedSymbolBidPrice = selectedSymbolPrices["bid_price"]
-    selectedSymbolAskPrice = selectedSymbolPrices["ask_price"]
-
-    # get symbol minimum lot size and minimum notional
+    tick_size = float(list(filter(lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
+    step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
+    price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
+    price = floatPrecision(price, tick_size)
+    btc_balance = float(client.get_asset_balance(asset="BTC")['free']) / 2
+    quantity = floatPrecision(btc_balance / float(price), step_size)
+    selectedSymbolBalance = round(Price.fromstring(client.get_asset_balance(asset=selectedSymbolName)['free']).amount,
+                                  8)
     selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
-    selectedSymbolMinNotional = get_symbol_minimum_notional(symbol_info)
 
-    # print(selectedSymbolMinLotSize)
-    # print(selectedSymbolMinNotional)
-    # print(tickers)
-
-    # GET BTC AND SELECTED SYMBOL BALANCE
-    btcBalance = get_btc_balance(client)
-    selectedSymbolBalance = get_symbol_balance(client, selectedSymbol)
-    btcBalance = btcBalance / 20  # 2% usable
-
+    print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
     print("")
 
-    q = round(calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) - (
-            calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) * Decimal(0.1)) / 100, 0)
-    order = client.order_market_buy(symbol=selectedSymbol, quantity=q)
-    selectedSymbolInitialBuyPrice = round(Price.fromstring(order["fills"][0]["price"]).amount, 8)
+    # order = client.order_limit_buy(symbol='ETHUSDT', quantity=quantity, price=price)
+    order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 
-    btcBalance = get_btc_balance(client)
-    selectedSymbolBalance = get_symbol_balance(client, selectedSymbol)
+    selectedSymbolInitialBuyPrice = floatPrecision(order["fills"][0]["price"], tick_size)
+    # selectedSymbolInitialBuyPrice = floatPrecision(selectedSymbolInitialBuyPrice, tick_size)
+    selectedSymbolLastPrice = selectedSymbolInitialBuyPrice
+
+    selectedSymbolStopLossPrice = round(Decimal(selectedSymbolInitialBuyPrice) - (
+        round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * stopLossPercent / 100, 8)
+    selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (
+        round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
+
+    print()
+    precision = len(str(step_size)[2:])
+    if selectedSymbolMinLotSize == '1.00000000':
+        precision = 0
+
+    selectedSymbolBalance = round(Decimal(client.get_asset_balance(asset=selectedSymbolName)['free']), precision)
+
+    print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
     print("")
 
-    print(stylize("Selected Symbol Initial Buy Price: " + str(selectedSymbolInitialBuyPrice), colored.fg("green")))
+    quantity = round(selectedSymbolBalance, precision) - round(
+        (round(selectedSymbolBalance, precision) * 3) / 100, precision)
+    print(quantity)
+    # q = round(calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) - (calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) * Decimal(0.1)) / 100, 0)
+    # order = client.order_market_buy(symbol=selectedSymbol, quantity=q)
+    # selectedSymbolInitialBuyPrice = round(Price.fromstring(order["fills"][0]["price"]).amount, 8)
+    #
+    # btcBalance = get_btc_balance(client)
+    # selectedSymbolBalance = get_symbol_balance(client, selectedSymbol)
+    # print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
+    # print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
+    # print("")
+    #
+    # print(stylize("Selected Symbol Initial Buy Price: " + str(selectedSymbolInitialBuyPrice), colored.fg("green")))
+    while True:
+        # get symbol info
+        # get symbol info
+        symbol_info = client.get_symbol_info(selectedSymbol)
+        tick_size = float(
+            list(filter(lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
+        step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
+        price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
+        price = floatPrecision(price, tick_size)
+        btc_balance = float(client.get_asset_balance(asset='BTC')['free'])
+        quantity = floatPrecision(btc_balance / float(price), step_size)
+        selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
-    while (True):
-        tickers = client.get_orderbook_tickers()
-        selectedSymbolPrices = get_symbol_ask_bid_price(tickers, selectedSymbol)
-        selectedSymbolBidPrice = selectedSymbolPrices["bid_price"]
-        selectedSymbolAskPrice = selectedSymbolPrices["ask_price"]
+        precision = 2
+        if selectedSymbolMinLotSize == '1.00000000':
+            precision = 0
 
-        # SET STOP LOSS
-        if selectedSymbolLastPrice == 0:
-            selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
-            selectedSymbolStopLossPrice = calculate_calculate_percent_price(selectedSymbolLastPrice, stopLossPercent)
-            selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolLastPrice, takeProfitPercent)
+        selectedSymbolBalance = round(Decimal(client.get_asset_balance(asset=selectedSymbolName)['free']),
+                                      len(str(step_size)[2:]))
 
-        # TAKE PROFIT UPDATE
-        if selectedSymbolBidPrice > selectedSymbolLastPrice and selectedSymbolBidPrice > selectedSymbolInitialBuyPrice:
-            selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
-            selectedSymbolSellPrice = calculate_calculate_percent_price(selectedSymbolBidPrice, takeProfitPercent)
-            print(stylize("New price target: " + str(selectedSymbolBidPrice), colored.fg("yellow")))
+        if float(price) > float(selectedSymbolInitialBuyPrice) and float(price) > float(selectedSymbolLastPrice):
+            selectedSymbolLastPrice = price
+            selectedSymbolSellPrice = round(Decimal(price) + (
+                round(Price.fromstring(price).amount, 8)) * takeProfitPercent / 100, 8)
+            print(stylize("New price target: " + str(selectedSymbolSellPrice), colored.fg("yellow")))
 
-        print_current_status(selectedSymbolBidPrice, selectedSymbolAskPrice, selectedSymbolSellPrice,
-                             selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice)
+        print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,
+                             selectedSymbolSellPrice)
 
         # STOP LOSS SELL
-        if selectedSymbolBidPrice <= selectedSymbolStopLossPrice:
-            quantity = calculate_quantity(selectedSymbolBalance, selectedSymbolMinLotSize)
-            # order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
+        if float(price) <= selectedSymbolStopLossPrice:
+            precision = 2
+            if selectedSymbolMinLotSize == '1.00000000':
+                precision = 0
+
+            quantity = round(selectedSymbolBalance, precision) - round(
+                (round(selectedSymbolBalance, precision) * 3) / 100, precision)
+            print(quantity)
+
+            order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
             break
 
         # TAKE PROFIT SELL
-        if selectedSymbolBidPrice <= selectedSymbolSellPrice:
-            if selectedSymbolBidPrice > selectedSymbolInitialBuyPrice:
-                quantity = calculate_quantity(selectedSymbolBalance, selectedSymbolMinLotSize)
+        print(round(Decimal(price), 8) <= selectedSymbolSellPrice)
+        print(round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8))
+        if round(Decimal(price), 8) <= selectedSymbolSellPrice:
+            if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
+
+                precision = 2
+                if selectedSymbolMinLotSize == '1.00000000':
+                    precision = 0
+
+                # quantity = round(selectedSymbolBalance, precision) - round((round(selectedSymbolBalance, precision) * 3) / 100, precision)
+                quantity = floatPrecision(selectedSymbolBalance / float(price), step_size)
+                print(quantity)
+                order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
                 # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
                 print_take_profit_result(quantity, selectedSymbolSellPrice)
                 break
 
-        selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
+        ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
         time.sleep(0.5)

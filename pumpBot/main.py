@@ -108,7 +108,7 @@ secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
 selectedSymbolName = sys.argv[1]
-#selectedSymbolName = "lit"
+# selectedSymbolName = "lit"
 selectedSymbol = selectedSymbolName.upper() + "BTC"
 selectedSymbolLastPrice = 0.0
 selectedSymbolBidPrice = 0.0
@@ -221,11 +221,10 @@ if __name__ == "__main__":
         # TAKE PROFIT SELL
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
-
                 print(quantity)
 
-                order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
-                # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
+                # order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
+                order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=price)
                 print_take_profit_result(selectedSymbolBalance, selectedSymbolSellPrice)
                 break
 

@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
         # STOP LOSS SELL
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
-            quantity = selectedSymbolBalance
+            selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 2) / 100), p)
             print(quantity)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
@@ -217,7 +217,7 @@ if __name__ == "__main__":
         # TAKE PROFIT SELL
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
-                quantity = selectedSymbolBalance
+                selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 2) / 100), p)
 
                 print(quantity)
 

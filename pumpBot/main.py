@@ -65,7 +65,7 @@ def print_take_profit_result(quantity, sell_price):
     print(stylize("Quantity: " + str(quantity), colored.fg("green")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("green")))
     print(stylize(
-        "Profit: " + str(quantity * sell_price) + " BTC",
+        "Profit: " + str(float(quantity) * float(sell_price)) + " BTC",
         colored.fg("green")))
     print("")
 
@@ -75,7 +75,7 @@ def print_stop_loss_result(quantity, sell_price):
     print(stylize("Quantity: " + str(quantity), colored.fg("red")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("red")))
     print(stylize(
-        "Loss:" + str(quantity * sell_price) + " BTC",
+        "Loss:" + str(float(quantity) * float(sell_price)) + " BTC",
         colored.fg("red")))
     print("")
 
@@ -107,7 +107,7 @@ apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
 secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
-selectedSymbolName = "comp"
+selectedSymbolName = "zrx"
 selectedSymbol = selectedSymbolName.upper() + "BTC"
 # selectedSymbol = sys.argv[1].upper() + "BTC"
 selectedSymbolLastPrice = 0.0
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
     price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
     price = floatPrecision(price, tick_size)
-    btc_balance = float(client.get_asset_balance(asset="BTC")['free']) / 2
+    btc_balance = float(client.get_asset_balance(asset="BTC")['free'])
     quantity = floatPrecision(btc_balance / float(price), step_size)
     selectedSymbolBalance = round(Price.fromstring(client.get_asset_balance(asset=selectedSymbolName)['free']).amount,
                                   8)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
     print("")
-
+    print(quantity)
     # order = client.order_limit_buy(symbol='ETHUSDT', quantity=quantity, price=price)
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 
@@ -154,21 +154,13 @@ if __name__ == "__main__":
     selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (
         round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
 
-    print()
-    precision = len(str(step_size)[2:])
-    if selectedSymbolMinLotSize == '1.00000000':
-        precision = 0
-
-    selectedSymbolBalance = round(Decimal(client.get_asset_balance(asset=selectedSymbolName)['free']), precision)
+    selectedSymbolBalance = quantity
 
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
     print("")
 
-    quantity = round(selectedSymbolBalance, precision) - round(
-        (round(selectedSymbolBalance, precision) * 3) / 100, precision)
-    print(quantity)
     # q = round(calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) - (calculate_max_buy_quantity(selectedSymbolBidPrice, btcBalance) * Decimal(0.1)) / 100, 0)
     # order = client.order_market_buy(symbol=selectedSymbol, quantity=q)
     # selectedSymbolInitialBuyPrice = round(Price.fromstring(order["fills"][0]["price"]).amount, 8)
@@ -193,13 +185,6 @@ if __name__ == "__main__":
         quantity = floatPrecision(btc_balance / float(price), step_size)
         selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
-        precision = 2
-        if selectedSymbolMinLotSize == '1.00000000':
-            precision = 0
-
-        selectedSymbolBalance = round(Decimal(client.get_asset_balance(asset=selectedSymbolName)['free']),
-                                      len(str(step_size)[2:]))
-
         if float(price) > float(selectedSymbolInitialBuyPrice) and float(price) > float(selectedSymbolLastPrice):
             selectedSymbolLastPrice = price
             selectedSymbolSellPrice = round(Decimal(price) + (
@@ -210,13 +195,8 @@ if __name__ == "__main__":
                              selectedSymbolSellPrice)
 
         # STOP LOSS SELL
-        if float(price) <= selectedSymbolStopLossPrice:
-            precision = 2
-            if selectedSymbolMinLotSize == '1.00000000':
-                precision = 0
-
-            quantity = round(selectedSymbolBalance, precision) - round(
-                (round(selectedSymbolBalance, precision) * 3) / 100, precision)
+        if selectedSymbolBidPrice <= selectedSymbolStopLossPrice:
+            quantity = selectedSymbolBalance
             print(quantity)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
@@ -228,14 +208,10 @@ if __name__ == "__main__":
         print(round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8))
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
+                quantity = selectedSymbolBalance
 
-                precision = 2
-                if selectedSymbolMinLotSize == '1.00000000':
-                    precision = 0
-
-                # quantity = round(selectedSymbolBalance, precision) - round((round(selectedSymbolBalance, precision) * 3) / 100, precision)
-                quantity = floatPrecision(selectedSymbolBalance / float(price), step_size)
                 print(quantity)
+
                 order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
                 # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
                 print_take_profit_result(quantity, selectedSymbolSellPrice)

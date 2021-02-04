@@ -213,7 +213,7 @@ if __name__ == "__main__":
                 print(quantity)
 
                 order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
-                # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
+                order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
                 print_take_profit_result(quantity, selectedSymbolSellPrice)
                 break
 

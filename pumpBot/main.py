@@ -120,7 +120,7 @@ selectedSymbolStopLossPrice = 0.0
 selectedSymbolInitialBuyPrice = 0.0
 btcBalance = 0.0
 selectedSymbolBalance = 0.0
-stopLossPercent = 1  # 3%
+stopLossPercent = 3  # 3%
 takeProfitPercent = 1  # 1%
 baseAssetPrecision = 0.0
 

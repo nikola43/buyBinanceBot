@@ -143,6 +143,12 @@ if __name__ == "__main__":
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
     print("..")
     print(quantity)
+    p = len(str(step_size)[2:])
+    print(str(step_size)[2:])
+    print(p)
+    if p == 1:
+        p = 0
+    quantity = round(Decimal(quantity) - ((Decimal(quantity) * 2) / 100), p)
     # order = client.order_limit_buy(symbol='ETHUSDT', quantity=quantity, price=price)
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 

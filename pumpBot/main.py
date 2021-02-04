@@ -107,8 +107,8 @@ apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
 secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
-# selectedSymbolName = sys.argv[1]
-selectedSymbolName = "xlm"
+selectedSymbolName = sys.argv[1]
+#selectedSymbolName = "xlm"
 selectedSymbol = selectedSymbolName.upper() + "BTC"
 # selectedSymbol = sys.argv[1].upper() + "BTC"
 selectedSymbolLastPrice = 0.0

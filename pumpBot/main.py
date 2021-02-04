@@ -107,7 +107,8 @@ apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
 secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
-selectedSymbolName = sys.argv[1]
+# selectedSymbolName = sys.argv[1]
+selectedSymbolName = "xlm"
 selectedSymbol = selectedSymbolName.upper() + "BTC"
 # selectedSymbol = sys.argv[1].upper() + "BTC"
 selectedSymbolLastPrice = 0.0
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
-    print("")
+    print("..")
     print(quantity)
     # order = client.order_limit_buy(symbol='ETHUSDT', quantity=quantity, price=price)
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
@@ -155,6 +156,16 @@ if __name__ == "__main__":
         round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
 
     selectedSymbolBalance = quantity
+
+    # quantity =
+    p = len(str(step_size)[2:])
+    print(str(step_size)[2:])
+    print(p)
+    if p == 1:
+        p = 0
+
+    selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 2) / 100), p)
+    print(selectedSymbolBalance)
 
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
@@ -204,8 +215,6 @@ if __name__ == "__main__":
             break
 
         # TAKE PROFIT SELL
-        print(round(Decimal(price), 8) <= selectedSymbolSellPrice)
-        print(round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8))
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
                 quantity = selectedSymbolBalance
@@ -213,7 +222,7 @@ if __name__ == "__main__":
                 print(quantity)
 
                 order = client.order_market_sell(symbol=selectedSymbol, quantity=quantity)
-                #order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
+                # order = client.order_limit_sell(symbol=selectedSymbol, quantity=quantity,price=str(selectedSymbolSellPrice))
                 print_take_profit_result(quantity, selectedSymbolSellPrice)
                 break
 

@@ -195,7 +195,7 @@ if __name__ == "__main__":
                              selectedSymbolSellPrice)
 
         # STOP LOSS SELL
-        if selectedSymbolBidPrice <= selectedSymbolStopLossPrice:
+        if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
             quantity = selectedSymbolBalance
             print(quantity)
 

@@ -120,8 +120,8 @@ selectedSymbolStopLossPrice = 0.0
 selectedSymbolInitialBuyPrice = 0.0
 btcBalance = 0.0
 selectedSymbolBalance = 0.0
-stopLossPercent = 3  # 3%
-takeProfitPercent = 1  # 1%
+stopLossPercent = 1  # 3%
+takeProfitPercent = 1 # 1%
 baseAssetPrecision = 0.0
 
 if __name__ == "__main__":
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
     price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
     price = floatPrecision(price, tick_size)
-    btc_balance = float(client.get_asset_balance(asset="BTC")['free'])
+    btc_balance = float(client.get_asset_balance(asset="BTC")['free']) / 10
     quantity = floatPrecision(btc_balance / float(price), step_size)
     selectedSymbolBalance = round(Price.fromstring(client.get_asset_balance(asset=selectedSymbolName)['free']).amount,
                                   8)
@@ -171,7 +171,8 @@ if __name__ == "__main__":
 
     selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), p)
     print(selectedSymbolBalance)
-
+    p = round(Decimal(price) - round(Price.fromstring(price).amount), 8)), 8)
+    print(p)
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
@@ -197,7 +198,7 @@ if __name__ == "__main__":
         step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
         price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
         price = floatPrecision(price, tick_size)
-        btc_balance = float(client.get_asset_balance(asset='BTC')['free'])
+        btc_balance = float(client.get_asset_balance(asset='BTC')['free']) / 10
         quantity = floatPrecision(btc_balance / float(price), step_size)
         selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
@@ -206,26 +207,35 @@ if __name__ == "__main__":
             selectedSymbolSellPrice = round(Decimal(price) + (
                 round(Price.fromstring(price).amount, 8)) * takeProfitPercent / 100, 8)
             print(stylize("New price target: " + str(selectedSymbolSellPrice), colored.fg("yellow")))
+            p = round(float(price) - (float(price) * 0.2) / 100, 8)
+            print(p)
+            order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
 
-        print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,
-                             selectedSymbolSellPrice)
+            break
 
+        print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,selectedSymbolSellPrice)
         # STOP LOSS SELL
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
             print(quantity)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
+            print_take_profit_result(selectedSymbolBalance,p)
             break
 
         # TAKE PROFIT SELL
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
                 print(quantity)
+                p = round(Price.fromstring(str( round(Decimal(price) + (Decimal(price) * 1) / 100, 8))).amount, 8)
+            
+                print(round(Decimal(price) + (Decimal(price) * 1) / 100, 8))
+                p = floatPrecision(p, tick_size)
+                print(p)
 
-                # order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
-                order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=price)
-                print_take_profit_result(selectedSymbolBalance, selectedSymbolSellPrice)
+                #order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
+                #order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=p)
+                print_take_profit_result(selectedSymbolBalance,p)
                 break
 
         ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)

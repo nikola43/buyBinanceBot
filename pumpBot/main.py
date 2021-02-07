@@ -217,15 +217,20 @@ if __name__ == "__main__":
             print("stopPrice " + p)
 
             print(p)
-            
-            
-            if order != None and order["status"] != "FILLED":
+
+            try:
+                o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+                print("Found!")
+                print(o)
                 client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
+                order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
+            except ValueError:
+                print("Not found!")
+                
             
-            order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
 
         try:
-            o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+            order = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
             print(o)
         except ValueError:
             print("Not found!")
@@ -240,15 +245,17 @@ if __name__ == "__main__":
         print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,selectedSymbolSellPrice)
         # STOP LOSS SELL
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
-            print(quantity)
-
-        if order != None and order["status"] != "FILLED":
-            client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
-
+            try:
+                o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+                print("cancel order!")
+                print(o)
+                client.cancel_order(symbol=selectedSymbol, orderId=o["orderId"])
+                break
+            except ValueError:
+                print("ERROR STOP LOSS")
+                
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
-            print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
-            break
-
+            print_stop_loss_result(quantity, selectedSymbolStopLossPrice)  
         # TAKE PROFIT SELL
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):

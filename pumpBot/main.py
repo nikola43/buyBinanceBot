@@ -149,8 +149,10 @@ if __name__ == "__main__":
     if p == 1:
         p = 0
     quantity = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), p)
-    # order = client.order_limit_buy(symbol='ETHUSDT', quantity=quantity, price=price)
-    order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
+    order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
+    client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
+
+    #order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 
     selectedSymbolInitialBuyPrice = floatPrecision(order["fills"][0]["price"], tick_size)
     # selectedSymbolInitialBuyPrice = floatPrecision(selectedSymbolInitialBuyPrice, tick_size)
@@ -217,7 +219,7 @@ if __name__ == "__main__":
             
             
             if orderId > 0:
-                client.cancel_orders(symbol=selectedSymbol)
+                client.cancel_order(symbol=selectedSymbol, orderId=orderId)
             
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
             orderId = order["orderId"]
@@ -237,8 +239,7 @@ if __name__ == "__main__":
             print(quantity)
             
             if orderId > 0:
-                result = client.cancel_orders(symbol=selectedSymbol)
-                print(result)
+                client.cancel_order(symbol=selectedSymbol, orderId=orderId)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)

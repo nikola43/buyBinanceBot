@@ -282,8 +282,8 @@ if __name__ == "__main__":
                     price) + (round(Price.fromstring(price).amount, 8)) * Decimal(takeProfitPercent) / 100, 8)
                 stopPrice = floatPrecision(
                     str(round(Decimal(price) - (Decimal(price) * Decimal(stopLossPercent)) / 100, 8)), tick_size)
-                print("price " + price)
-                print("stopPrice " + stopPrice)
+                print("price " + stopPrice)
+                print("stopPrice " + selectedSymbolSellPrice)
 
                 print(stopPrice)
 
@@ -300,7 +300,7 @@ if __name__ == "__main__":
                     print("Not found!")
 
                 order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                            quantity=selectedSymbolBalance, price=str(selectedSymbolSellPrice), stopPrice=stopPrice, timeInForce="GTC")
+                                            quantity=selectedSymbolBalance, price=str(stopPrice), stopPrice=str(selectedSymbolSellPrice), timeInForce="GTC")
 
             try:
                 if (order != None):

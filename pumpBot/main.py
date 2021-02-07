@@ -281,7 +281,7 @@ if __name__ == "__main__":
                 selectedSymbolSellPrice = round(Decimal(
                     price) + (round(Price.fromstring(price).amount, 8)) * Decimal(takeProfitPercent) / 100, 8)
                 stopPrice = floatPrecision(
-                    str(round(Decimal(price) - (Decimal(price) * Decimal(stopLossPercent)) / 100, 8)), tick_size)
+                    str(round(Decimal(selectedSymbolSellPrice) - (Decimal(selectedSymbolSellPrice) * Decimal(0.5)) / 100, 8)), tick_size)
                 print("price " + stopPrice)
                 print("stopPrice " + str(selectedSymbolSellPrice))
 

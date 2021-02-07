@@ -296,10 +296,11 @@ if __name__ == "__main__":
                         client.cancel_order(
                             symbol=selectedSymbol, orderId=order["orderId"])
                         print(stylize("order cancelated", colored.fg("red")))
-                        order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                                    quantity=selectedSymbolBalance, price=price, stopPrice=stopPrice, timeInForce="GTC")
                 except:
                     print("Not found!")
+
+                order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
+                                            quantity=selectedSymbolBalance, price=price, stopPrice=stopPrice, timeInForce="GTC")
 
             try:
                 if (order != None):

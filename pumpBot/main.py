@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), p)
     print(selectedSymbolBalance)
-    p = round(Decimal(price) - round(Price.fromstring(price).amount), 8), 8)
+    p = round(Decimal(price) - round(Price.fromstring(price).amount, 8), 8)
     print(p)
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))

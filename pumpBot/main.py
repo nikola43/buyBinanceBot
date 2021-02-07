@@ -227,6 +227,7 @@ if __name__ == "__main__":
             order["status"]
             if order["status"] == "FILLED":
                 print_take_profit_result(selectedSymbolBalance,p)
+                break
 
                 
 
@@ -250,12 +251,12 @@ if __name__ == "__main__":
             
                 print(round(Decimal(price) + (Decimal(price) * 1) / 100, 8))
                 p = floatPrecision(p, tick_size)
-                print(p)
+                #print(p)
 
                 #order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
                 #order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=p)
-                print_take_profit_result(selectedSymbolBalance,p)
-                break
+                #print_take_profit_result(selectedSymbolBalance,p)
+                #break
 
         ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
         time.sleep(0.5)

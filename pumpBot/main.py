@@ -219,16 +219,21 @@ if __name__ == "__main__":
             print(p)
             
             
-            if order != None:
+            if order != None and order["status"] != "FILLED":
                 client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
             
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
-            
-        if order != None:
+
+        try:
             o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
-            if o["status"] == "FILLED":
-                print_take_profit_result(selectedSymbolBalance,p)
-                break
+            print(o)
+        except ValueError:
+            print("Not found!")
+        else:
+            print("Found!")
+        #print_take_profit_result(selectedSymbolBalance,p)
+               
+               
 
                 
 
@@ -237,7 +242,7 @@ if __name__ == "__main__":
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
             print(quantity)
 
-        if order != None:
+        if order != None and order["status"] != "FILLED":
             client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)

@@ -84,12 +84,13 @@ def get_symbol_ask_bid_price(tickers, symbol_name, base_asset_precision):
             return ask_bid_price
 
 
-def print_take_profit_result(quantity, sell_price):
+def print_take_profit_result(quantity, buy_price, sell_price):
     print(stylize("Take Profit Sell ", colored.fg("green")))
     print(stylize("Quantity: " + str(quantity), colored.fg("green")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("green")))
     print(stylize(
-        "Profit: " + str(float(quantity) * float(sell_price)) + " BTC",
+        "Profit: " + str((float(quantity) * float(sell_price)) -
+                         (float(quantity) * float(buy_price))) + " BTC",
         colored.fg("green")))
     print("")
 
@@ -99,7 +100,8 @@ def print_stop_loss_result(quantity, sell_price):
     print(stylize("Quantity: " + str(quantity), colored.fg("red")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("red")))
     print(stylize(
-        "Loss: " + str(float(quantity) * float(sell_price)) + " BTC",
+        "Loss: " + str((float(quantity) * float(sell_price)) -
+                       (float(quantity) * float(buy_price))) + " BTC",
         colored.fg("red")))
     print("")
 
@@ -279,9 +281,9 @@ if __name__ == "__main__":
                               str(selectedSymbolSellPrice), colored.fg("yellow")))
                 selectedSymbolLastPrice = price
                 selectedSymbolSellPrice = round(Decimal(
-                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.5) / 100, 8)
+                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.4) / 100, 8)
                 stopPrice = floatPrecision(
-                    str(round(Decimal(price) - (Decimal(price) * Decimal(1)) / 100, 8)), tick_size)
+                    str(round(Decimal(price) - (Decimal(price) * Decimal(0.8)) / 100, 8)), tick_size)
                 print("price " + str(selectedSymbolSellPrice))
                 print("stopPrice " + stopPrice)
 
@@ -309,8 +311,9 @@ if __name__ == "__main__":
                         order = o
             except:
                 print("not found")
-                #print_take_profit_result(selectedSymbolBalance, price)
-                # break
+                print_take_profit_result(
+                    selectedSymbolBalance, selectedSymbolInitialBuyPrice, price)
+                break
 
             print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice,
                                  selectedSymbolInitialBuyPrice, selectedSymbolSellPrice)

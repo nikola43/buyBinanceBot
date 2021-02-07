@@ -123,6 +123,7 @@ selectedSymbolBalance = 0.0
 stopLossPercent = 1  # 3%
 takeProfitPercent = 1 # 1%
 baseAssetPrecision = 0.0
+orderId = 0
 
 if __name__ == "__main__":
     # get symbol info
@@ -209,14 +210,22 @@ if __name__ == "__main__":
             print(stylize("New price target: " + str(selectedSymbolSellPrice), colored.fg("yellow")))
             p = round(float(price) - (float(price) * 0.2) / 100, 8)
             print(p)
+            
+            
+            if orderId > 0:
+                result = client.cancel_order(symbol=selectedSymbol,orderId=orderId)
+            
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
-
+            orderId = order["orderId"]
             break
 
         print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,selectedSymbolSellPrice)
         # STOP LOSS SELL
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
             print(quantity)
+            
+            if orderId > 0:
+                result = client.cancel_order(symbol=selectedSymbol,orderId=orderId)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)

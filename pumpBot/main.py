@@ -282,8 +282,8 @@ if __name__ == "__main__":
                     price) + (round(Price.fromstring(price).amount, 8)) * Decimal(takeProfitPercent) / 100, 8)
                 stopPrice = floatPrecision(
                     str(round(Decimal(selectedSymbolSellPrice) - (Decimal(selectedSymbolSellPrice) * Decimal(0.5)) / 100, 8)), tick_size)
-                print("price " + stopPrice)
-                print("stopPrice " + str(selectedSymbolSellPrice))
+                print("price " + str(selectedSymbolSellPrice))
+                print("stopPrice " + stopPrice)
 
                 print(stopPrice)
 
@@ -292,7 +292,6 @@ if __name__ == "__main__":
                         o = client.get_order(
                             symbol=selectedSymbol, orderId=order["orderId"])
 
-                        print(o)
                         client.cancel_order(
                             symbol=selectedSymbol, orderId=order["orderId"])
                         print(stylize("order cancelated", colored.fg("red")))
@@ -300,7 +299,7 @@ if __name__ == "__main__":
                     print("Not found!")
 
                 order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                            quantity=selectedSymbolBalance, price=str(selectedSymbolSellPrice), stopPrice=stopPrice, timeInForce="GTC")
+                                            quantity=selectedSymbolBalance, price=stopPrice, stopPrice=str(selectedSymbolSellPrice), timeInForce="GTC")
 
             try:
                 if (order != None):
@@ -308,7 +307,6 @@ if __name__ == "__main__":
                         symbol=selectedSymbol, orderId=order["orderId"])
                     if (o != None):
                         order = o
-                        print(o)
             except:
                 print("not found")
                 #print_take_profit_result(selectedSymbolBalance, price)

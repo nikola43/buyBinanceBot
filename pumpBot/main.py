@@ -208,7 +208,7 @@ if __name__ == "__main__":
             selectedSymbolSellPrice = round(Decimal(price) + (
                 round(Price.fromstring(price).amount, 8)) * takeProfitPercent / 100, 8)
             print(stylize("New price target: " + str(selectedSymbolSellPrice), colored.fg("yellow")))
-            p = round(Price.fromstring(price).amount, selectedSymbolMinLotSize) - (round(Price.fromstring(price).amount, selectedSymbolMinLotSize) * 1) / 100
+            p = floatPrecision(str(round(Decimal(price) - (Decimal(price) * Decimal(0.1)) / 100, 8)), tick_size)
             #p = round(float(str(price)) - (float(str(price)) * 1) / 100, 8)
             print("price " + price)
             print("stopPrice " + p)

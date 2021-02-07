@@ -153,6 +153,7 @@ if __name__ == "__main__":
     #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
+    print(order)
 
     selectedSymbolInitialBuyPrice = floatPrecision(order["fills"][0]["price"], tick_size)
     # selectedSymbolInitialBuyPrice = floatPrecision(selectedSymbolInitialBuyPrice, tick_size)

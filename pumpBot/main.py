@@ -123,7 +123,7 @@ selectedSymbolBalance = 0.0
 stopLossPercent = 1  # 3%
 takeProfitPercent = 1 # 1%
 baseAssetPrecision = 0.0
-orderId = 0
+order = None
 
 if __name__ == "__main__":
     # get symbol info
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         p = 0
     quantity = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), p)
     order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
-    client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
+    #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
     #order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 
@@ -218,13 +218,12 @@ if __name__ == "__main__":
             print(p)
             
             
-            if orderId > 0:
-                client.cancel_order(symbol=selectedSymbol, orderId=orderId)
+            if order != None:
+                client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
             
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
-            orderId = order["orderId"]
             
-        if orderId > 0:
+        if order != None:
             order = client.get_order(symbol=selectedSymbol,orderId=orderId)
             order["status"]
             if order["status"] == "FILLED":
@@ -237,9 +236,9 @@ if __name__ == "__main__":
         # STOP LOSS SELL
         if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
             print(quantity)
-            
-            if orderId > 0:
-                client.cancel_order(symbol=selectedSymbol, orderId=orderId)
+
+        if order != None:
+            client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)

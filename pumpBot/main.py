@@ -250,12 +250,12 @@ if __name__ == "__main__":
                 print("cancel order!")
                 print(o)
                 client.cancel_order(symbol=selectedSymbol, orderId=o["orderId"])
-                break
             except:
-                print("ERROR STOP LOSS")
+                print("No hay order que cancelar LOSS")
                 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
-            print_stop_loss_result(quantity, selectedSymbolStopLossPrice)  
+            print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
+            break  
         # TAKE PROFIT SELL
         if round(Decimal(price), 8) <= selectedSymbolSellPrice:
             if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):

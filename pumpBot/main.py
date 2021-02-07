@@ -223,7 +223,7 @@ if __name__ == "__main__":
             orderId = order["orderId"]
             break
             
-        if orderId > 0
+        if orderId > 0:
             order = client.get_order(symbol=selectedSymbol,orderId=orderId)
             order["status"]
             if order["status"] == "FILLED":

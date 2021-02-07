@@ -8,6 +8,38 @@ import sys
 import math
 
 
+import os
+
+from telethon import TelegramClient, events, utils
+
+def get_coin_name(text):
+    substring = "$"
+    coin = ""
+
+    try:
+        i = text.index(substring)
+        coin = text[i:]
+        coin = coin.split(" ")[0]
+        print(coin)
+        print(i)
+    except ValueError:
+        print("Not found!")
+    else:
+        print("Found!")
+    return coin
+
+def get_env(name, message, cast=str):
+    if name in os.environ:
+        return os.environ[name]
+    while True:
+        value = input(message)
+        try:
+            return cast(value)
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            time.sleep(1)
+
+
 def calculate_percent(value, percent):
     return (value * percent) / 100
 
@@ -107,6 +139,9 @@ apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
 secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 
 client = Client(apikey, secret)
+
+useTelegram = False
+
 selectedSymbolName = sys.argv[1]
 # selectedSymbolName = "lit"
 selectedSymbol = selectedSymbolName.upper() + "BTC"

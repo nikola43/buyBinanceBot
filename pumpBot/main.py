@@ -307,12 +307,6 @@ if __name__ == "__main__":
                 print("Not found!")
                 
         try:
-            print('(Press Ctrl+C to stop this)')
-            telegram.run_until_disconnected()
-        finally:
-            telegram.disconnect()    
-
-        try:
             o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
             if (o != None):
                 order = o
@@ -356,3 +350,4 @@ if __name__ == "__main__":
 
         ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
         time.sleep(0.5)
+    telegram.disconnect()

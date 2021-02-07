@@ -300,7 +300,7 @@ if __name__ == "__main__":
                     print("Not found!")
 
                 order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                            quantity=selectedSymbolBalance, price=price, stopPrice=stopPrice, timeInForce="GTC")
+                                            quantity=selectedSymbolBalance, price=stopPrice, stopPrice=price, timeInForce="GTC")
 
             try:
                 if (order != None):

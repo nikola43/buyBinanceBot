@@ -217,7 +217,7 @@ if __name__ == "__main__":
             
             
             if orderId > 0:
-                result = client.cancel_order(symbol=selectedSymbol,orderId=orderId)
+                result = client.cancel_order(symbol=selectedSymbol)
             
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
             print(order)
@@ -238,7 +238,7 @@ if __name__ == "__main__":
             print(quantity)
             
             if orderId > 0:
-                result = client.cancel_order(symbol=selectedSymbol,orderId=orderId)
+                result = client.cancel_order(symbol=selectedSymbol)
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)

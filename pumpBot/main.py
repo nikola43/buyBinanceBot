@@ -281,9 +281,9 @@ if __name__ == "__main__":
                               str(selectedSymbolSellPrice), colored.fg("yellow")))
                 selectedSymbolLastPrice = price
                 selectedSymbolSellPrice = round(Decimal(
-                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.4) / 100, 8)
+                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.2) / 100, 8)
                 stopPrice = floatPrecision(
-                    str(round(Decimal(price) - (Decimal(price) * Decimal(0.8)) / 100, 8)), tick_size)
+                    str(round(Decimal(price) - (Decimal(price) * Decimal(0.4)) / 100, 8)), tick_size)
                 print("price " + str(selectedSymbolSellPrice))
                 print("stopPrice " + stopPrice)
 

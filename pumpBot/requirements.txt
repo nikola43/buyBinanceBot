@@ -24,7 +24,6 @@ regex==2020.11.13
 requests==2.25.1
 service-identity==18.1.0
 six==1.15.0
-Twisted==20.3.0
 txaio==20.12.1
 tzlocal==2.1
 ujson==4.0.2

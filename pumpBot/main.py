@@ -139,7 +139,7 @@ def floatPrecision(f, n):
 # Use https://regexone.com/ if you want a more interactive way of learning.
 #
 # "(?i)" makes it case-insensitive, and | separates "options".
-@client.on(events.NewMessage())#pattern=r'(?i).*\b(hello|hi)\b'))
+@telegram.on(events.NewMessage())#pattern=r'(?i).*\b(hello|hi)\b'))
 async def handler(event):
     sender = await event.get_sender()
     #client.get_input_entity(PeerChannel(fwd.from_id))
@@ -204,7 +204,7 @@ proxy = None  # https://github.com/Anorov/PySocks
 
 if __name__ == "__main__":
     
-    client = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
+    telegram = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
 
     # get symbol info
     symbol_info = client.get_symbol_info(selectedSymbol)
@@ -309,9 +309,9 @@ if __name__ == "__main__":
                 
         try:
             print('(Press Ctrl+C to stop this)')
-            client.run_until_disconnected()
+            telegram.run_until_disconnected()
         finally:
-            client.disconnect()    
+            telegram.disconnect()    
 
         try:
             o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])

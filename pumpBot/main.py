@@ -283,7 +283,7 @@ if __name__ == "__main__":
                 stopPrice = floatPrecision(
                     str(round(Decimal(price) - (Decimal(price) * Decimal(stopLossPercent)) / 100, 8)), tick_size)
                 print("price " + stopPrice)
-                print("stopPrice " + selectedSymbolSellPrice)
+                print("stopPrice " + str(selectedSymbolSellPrice))
 
                 print(stopPrice)
 

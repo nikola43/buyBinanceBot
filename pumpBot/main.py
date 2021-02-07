@@ -222,6 +222,14 @@ if __name__ == "__main__":
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
             orderId = order["orderId"]
             break
+            
+        if orderId > 0
+            order = client.get_order(symbol=selectedSymbol,orderId=orderId)
+            order["status"]
+            if order["status"] == "FILLED":
+                print_take_profit_result(selectedSymbolBalance,p)
+
+                
 
         print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,selectedSymbolSellPrice)
         # STOP LOSS SELL
@@ -233,7 +241,6 @@ if __name__ == "__main__":
 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
             print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
-            print_take_profit_result(selectedSymbolBalance,p)
             break
 
         # TAKE PROFIT SELL

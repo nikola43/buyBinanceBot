@@ -224,7 +224,7 @@ if __name__ == "__main__":
                 print(o)
                 client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
                 order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
-            except ValueError:
+            except:
                 print("Not found!")
                 
             
@@ -234,10 +234,8 @@ if __name__ == "__main__":
             if (o != None):
                 order = o
                 print(o)
-        except ValueError:
-            print("Not found!")
-        else:
-            print("Found!")
+        except:
+            print("not found")
         #print_take_profit_result(selectedSymbolBalance,p)
                
                
@@ -253,7 +251,7 @@ if __name__ == "__main__":
                 print(o)
                 client.cancel_order(symbol=selectedSymbol, orderId=o["orderId"])
                 break
-            except ValueError:
+            except:
                 print("ERROR STOP LOSS")
                 
             order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)

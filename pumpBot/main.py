@@ -12,11 +12,13 @@ import os
 
 from telethon import TelegramClient, events, utils
 
+
 def get_coin_name(text):
     try:
         return text[text.index("$"):].split(" ")[0][1:]
     except ValueError:
         return None
+
 
 def get_env(name, message, cast=str):
     if name in os.environ:
@@ -106,8 +108,10 @@ def print_current_status(price, high_price, stop_loss_price, initial_buy_price, 
     print(stylize("Current Price: " + str(price), colored.fg("green")))
     print(stylize("High Price: " + str(high_price), colored.fg("green")))
     print(stylize("Stop Loss Price: " + str(stop_loss_price), colored.fg("yellow")))
-    print(stylize("Selected Symbol Initial Buy Price: " + str(initial_buy_price), colored.fg("green")))
-    print(stylize("selectedSymbolSellPrice: " + str(take_profit_price), colored.fg("blue")))
+    print(stylize("Selected Symbol Initial Buy Price: " +
+                  str(initial_buy_price), colored.fg("green")))
+    print(stylize("selectedSymbolSellPrice: " +
+                  str(take_profit_price), colored.fg("blue")))
     print("")
 
 
@@ -146,7 +150,7 @@ selectedSymbolInitialBuyPrice = 0.0
 btcBalance = 0.0
 selectedSymbolBalance = 0.0
 stopLossPercent = 1  # 3%
-takeProfitPercent = 1 # 1%
+takeProfitPercent = 1  # 1%
 baseAssetPrecision = 0.0
 order = None
 buy = False
@@ -160,16 +164,16 @@ api_hash = "0d96604bf1fa9092de979309d1606466"
 proxy = None  # https://github.com/Anorov/PySocks
 telegram = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
 
+
 def make_initial_buy():
     print("DF")
-
 
 
 # `pattern` is a regex, see https://docs.python.org/3/library/re.html
 # Use https://regexone.com/ if you want a more interactive way of learning.
 #
 # "(?i)" makes it case-insensitive, and | separates "options".
-@telegram.on(events.NewMessage())#pattern=r'(?i).*\b(hello|hi)\b'))
+@telegram.on(events.NewMessage())  # pattern=r'(?i).*\b(hello|hi)\b'))
 async def handler(event):
     sender = await event.get_sender()
 
@@ -179,69 +183,76 @@ async def handler(event):
     if len(coin) > 0:
         selectedSymbol = coin.upper() + "BTC"
 
-    #client.get_input_entity(PeerChannel(fwd.from_id))
-    #channel = await event.get_channel()
+    # client.get_input_entity(PeerChannel(fwd.from_id))
+    # channel = await event.get_channel()
 
     #group = event.group()
     #group = event.get_group()
-    #print(group)
-    #print(utils.get_peer_id(sender))
-    #print(utils.get_input_location(sender))
-    #print(utils.get_input_dialog(sender))
-    #print(utils.get_inner_text(sender))
+    # print(group)
+    # print(utils.get_peer_id(sender))
+    # print(utils.get_input_location(sender))
+    # print(utils.get_input_dialog(sender))
+    # print(utils.get_inner_text(sender))
 
-    #print(utils.get_extension(sender))
-    #print(utils.get_attributes(sender))
-    #print(utils.get_input_user(sender))
+    # print(utils.get_extension(sender))
+    # print(utils.get_attributes(sender))
+    # print(utils.get_input_user(sender))
 
-
-
-    #print(utils.get_input_entity(PeerChannel(sender)))
-    #print(utils.get_input_channel(get_input_peer(channel)))
+    # print(utils.get_input_entity(PeerChannel(sender)))
+    # print(utils.get_input_channel(get_input_peer(channel)))
 
 if __name__ == "__main__":
     print("buy")
     # get symbol info
     symbol_info = client.get_symbol_info(selectedSymbol)
-    tick_size = float(list(filter(lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
-    step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
-    price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
+    tick_size = float(list(filter(
+        lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
+    step_size = float(list(filter(
+        lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
+    price = float(list(filter(
+        lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
     price = floatPrecision(price, tick_size)
     btc_balance = float(client.get_asset_balance(asset="BTC")['free']) / 10
     quantity = floatPrecision(btc_balance / float(price), step_size)
     selectedSymbolBalance = round(Price.fromstring(client.get_asset_balance(asset=selectedSymbolName)['free']).amount,
-                                    8)
+                                  8)
     selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
-    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
-    
-        
+    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " +
+                  str(selectedSymbolBalance), colored.fg("blue")))
+
     precision = len(str(step_size)[2:])
 
-    if p == 1:
-        p = 0
-    quantity = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), precision)
+    if precision == 1:
+        precision = 0
+    quantity = round(Decimal(quantity) -
+                     ((Decimal(quantity) * 5) / 100), precision)
     #order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
     #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
     print(order)
 
-    selectedSymbolInitialBuyPrice = floatPrecision(order["fills"][0]["price"], tick_size)
+    selectedSymbolInitialBuyPrice = floatPrecision(
+        order["fills"][0]["price"], tick_size)
     # selectedSymbolInitialBuyPrice = floatPrecision(selectedSymbolInitialBuyPrice, tick_size)
     selectedSymbolLastPrice = selectedSymbolInitialBuyPrice
 
-    selectedSymbolStopLossPrice = round(Decimal(selectedSymbolInitialBuyPrice) - (round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * stopLossPercent / 100, 8)
-    selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
+    selectedSymbolStopLossPrice = round(Decimal(selectedSymbolInitialBuyPrice) - (round(
+        Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * stopLossPercent / 100, 8)
+    selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (round(
+        Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
 
     selectedSymbolBalance = quantity
-    selectedSymbolBalance = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), precision)
+    selectedSymbolBalance = round(
+        Decimal(quantity) - ((Decimal(quantity) * 5) / 100), precision)
 
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
-    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " + str(selectedSymbolBalance), colored.fg("blue")))
+    print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " +
+                  str(selectedSymbolBalance), colored.fg("blue")))
     print("")
     buy = True
 
@@ -252,74 +263,89 @@ if __name__ == "__main__":
             symbol_info = client.get_symbol_info(selectedSymbol)
             tick_size = float(
                 list(filter(lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
-            step_size = float(list(filter(lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
-            price = float(list(filter(lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
+            step_size = float(list(filter(
+                lambda f: f['filterType'] == 'LOT_SIZE', symbol_info['filters']))[0]['stepSize'])
+            price = float(list(filter(
+                lambda x: x['symbol'] == selectedSymbol, client.get_all_tickers()))[0]['price'])
             price = floatPrecision(price, tick_size)
-            btc_balance = float(client.get_asset_balance(asset='BTC')['free']) / 10
+            btc_balance = float(
+                client.get_asset_balance(asset='BTC')['free']) / 10
             quantity = floatPrecision(btc_balance / float(price), step_size)
             selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
             if float(price) > float(selectedSymbolInitialBuyPrice) and float(price) > float(selectedSymbolLastPrice):
-                print(stylize("New price target: " + str(selectedSymbolSellPrice), colored.fg("yellow")))
+                print(stylize("New price target: " +
+                              str(selectedSymbolSellPrice), colored.fg("yellow")))
                 selectedSymbolLastPrice = price
-                selectedSymbolSellPrice = round(Decimal(price) + (round(Price.fromstring(price).amount, 8)) * takeProfitPercent / 100, 8)
-                p = floatPrecision(str(round(Decimal(price) - (Decimal(price) * Decimal(0.5)) / 100, 8)), tick_size)
+                selectedSymbolSellPrice = round(Decimal(
+                    price) + (round(Price.fromstring(price).amount, 8)) * takeProfitPercent / 100, 8)
+                stopPrice = floatPrecision(
+                    str(round(Decimal(price) - (Decimal(price) * Decimal(0.5)) / 100, 8)), tick_size)
                 print("price " + price)
                 print("stopPrice " + p)
 
-                print(p)
+                print(stopPrice)
 
                 try:
                     if (order != None):
-                        o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
-                
+                        o = client.get_order(
+                            symbol=selectedSymbol, orderId=order["orderId"])
+
                         print(o)
-                        client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
+                        client.cancel_order(
+                            symbol=selectedSymbol, orderId=order["orderId"])
                         print(stylize("order cancelated", colored.fg("red")))
-                        order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
+                        order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
+                                                    quantity=selectedSymbolBalance, price=price, stopPrice=stopPrice, timeInForce="GTC")
                 except:
                     print("Not found!")
-                    
+
             try:
                 if (order != None):
-                    o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+                    o = client.get_order(
+                        symbol=selectedSymbol, orderId=order["orderId"])
                     if (o != None):
                         order = o
                         print(o)
             except:
                 print("not found")
-            #print_take_profit_result(selectedSymbolBalance,p)
-                
-            print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice, selectedSymbolInitialBuyPrice,selectedSymbolSellPrice)
+            # print_take_profit_result(selectedSymbolBalance,p)
+
+            print_current_status(price, selectedSymbolLastPrice, selectedSymbolStopLossPrice,
+                                 selectedSymbolInitialBuyPrice, selectedSymbolSellPrice)
             # STOP LOSS SELL
             if round(Decimal(price), 8) <= selectedSymbolStopLossPrice:
                 try:
                     if (order != None):
-                        o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+                        o = client.get_order(
+                            symbol=selectedSymbol, orderId=order["orderId"])
                         print("cancel order!")
                         print(o)
-                        client.cancel_order(symbol=selectedSymbol, orderId=o["orderId"])
+                        client.cancel_order(
+                            symbol=selectedSymbol, orderId=o["orderId"])
                 except:
                     print("No hay order que cancelar LOSS")
-                    
-                order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
+
+                order = client.order_market_sell(
+                    symbol=selectedSymbol, quantity=selectedSymbolBalance)
                 print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
-                break  
-            
+                break
+
             # TAKE PROFIT SELL
             if round(Decimal(price), 8) <= selectedSymbolSellPrice:
                 if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
                     print(quantity)
-                    p = round(Price.fromstring(str( round(Decimal(price) + (Decimal(price) * 1) / 100, 8))).amount, 8)
-                
+                    p = round(Price.fromstring(
+                        str(round(Decimal(price) + (Decimal(price) * 1) / 100, 8))).amount, 8)
+
                     print(round(Decimal(price) + (Decimal(price) * 1) / 100, 8))
                     p = floatPrecision(p, tick_size)
-                    #print(p)
+                    # print(p)
 
                     #order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
                     #order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=p)
-                    #print_take_profit_result(selectedSymbolBalance,p)
-                    #break
+                    # print_take_profit_result(selectedSymbolBalance,p)
+                    # break
 
             ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
             time.sleep(0.5)

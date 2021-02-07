@@ -149,10 +149,10 @@ if __name__ == "__main__":
     if p == 1:
         p = 0
     quantity = round(Decimal(quantity) - ((Decimal(quantity) * 5) / 100), p)
-    order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
+    #order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
     #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
-    #order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
+    order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
 
     selectedSymbolInitialBuyPrice = floatPrecision(order["fills"][0]["price"], tick_size)
     # selectedSymbolInitialBuyPrice = floatPrecision(selectedSymbolInitialBuyPrice, tick_size)

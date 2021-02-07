@@ -230,8 +230,11 @@ if __name__ == "__main__":
             
 
         try:
-            order = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
-            print(o)
+            if (o != None):
+                o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+                if (o != None):
+                    order = o
+                    print(o)
         except ValueError:
             print("Not found!")
         else:

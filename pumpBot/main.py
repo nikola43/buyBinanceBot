@@ -224,9 +224,8 @@ if __name__ == "__main__":
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
             
         if order != None:
-            order = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
-            order["status"]
-            if order["status"] == "FILLED":
+            o = client.get_order(symbol=selectedSymbol,orderId=order["orderId"])
+            if o["status"] == "FILLED":
                 print_take_profit_result(selectedSymbolBalance,p)
                 break
 

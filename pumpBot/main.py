@@ -193,7 +193,19 @@ takeProfitPercent = 1 # 1%
 baseAssetPrecision = 0.0
 order = None
 
+
+session = "test"
+api_id = 2156362
+api_hash = "0d96604bf1fa9092de979309d1606466"
+proxy = None  # https://github.com/Anorov/PySocks
+
+
+
+
 if __name__ == "__main__":
+    
+    client = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
+
     # get symbol info
     symbol_info = client.get_symbol_info(selectedSymbol)
     tick_size = float(list(filter(lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])

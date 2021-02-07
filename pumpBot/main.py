@@ -252,14 +252,6 @@ if __name__ == "__main__":
     selectedSymbolBalance = round(
         Decimal(quantity) - ((Decimal(quantity) * 5) / 100), pres)
 
-
-    selectedSymbolSellPrice = round(Decimal(
-                    price) - (round(Price.fromstring(order["fills"][0]["price"]).amount, 8)) * Decimal(stopLossPercent) / 100, 8)
-    stopPrice = floatPrecision(
-                    str(round(Decimal(selectedSymbolSellPrice) - (Decimal(selectedSymbolSellPrice) * Decimal(0.1)) / 100, 8)), tick_size)
-    order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                            quantity=selectedSymbolBalance, price=stopPrice, stopPrice=str(selectedSymbolSellPrice), timeInForce="GTC")
-
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " +

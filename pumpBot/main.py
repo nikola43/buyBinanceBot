@@ -135,6 +135,38 @@ def floatPrecision(f, n):
     return str(int(f)) if int(n) == 0 else f
 
 
+apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
+secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
+
+client = Client(apikey, secret)
+
+useTelegram = False
+
+selectedSymbolName = sys.argv[1]
+# selectedSymbolName = "lit"
+selectedSymbol = selectedSymbolName.upper() + "BTC"
+selectedSymbolLastPrice = 0.0
+selectedSymbolBidPrice = 0.0
+selectedSymbolAskPrice = 0.0
+selectedSymbolSellPrice = 0.0
+selectedSymbolMinLotSize = 0.0
+selectedSymbolMinNotional = 0.0
+selectedSymbolStopLossPrice = 0.0
+selectedSymbolInitialBuyPrice = 0.0
+btcBalance = 0.0
+selectedSymbolBalance = 0.0
+stopLossPercent = 1  # 3%
+takeProfitPercent = 1 # 1%
+baseAssetPrecision = 0.0
+order = None
+
+
+session = "test"
+api_id = 2156362
+api_hash = "0d96604bf1fa9092de979309d1606466"
+proxy = None  # https://github.com/Anorov/PySocks
+telegram = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
+
 # `pattern` is a regex, see https://docs.python.org/3/library/re.html
 # Use https://regexone.com/ if you want a more interactive way of learning.
 #
@@ -168,43 +200,10 @@ async def handler(event):
     #print(utils.get_input_entity(PeerChannel(sender)))
     #print(utils.get_input_channel(get_input_peer(channel)))
 
-apikey = 'z8oJ86HRXRKHppUeLZMOY8564f3gnNueSrmOL1455SXtkTmyHwusLc1XCjjGBKZt'
-secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
-
-client = Client(apikey, secret)
-
-useTelegram = False
-
-selectedSymbolName = sys.argv[1]
-# selectedSymbolName = "lit"
-selectedSymbol = selectedSymbolName.upper() + "BTC"
-selectedSymbolLastPrice = 0.0
-selectedSymbolBidPrice = 0.0
-selectedSymbolAskPrice = 0.0
-selectedSymbolSellPrice = 0.0
-selectedSymbolMinLotSize = 0.0
-selectedSymbolMinNotional = 0.0
-selectedSymbolStopLossPrice = 0.0
-selectedSymbolInitialBuyPrice = 0.0
-btcBalance = 0.0
-selectedSymbolBalance = 0.0
-stopLossPercent = 1  # 3%
-takeProfitPercent = 1 # 1%
-baseAssetPrecision = 0.0
-order = None
-
-
-session = "test"
-api_id = 2156362
-api_hash = "0d96604bf1fa9092de979309d1606466"
-proxy = None  # https://github.com/Anorov/PySocks
-
-
 
 
 if __name__ == "__main__":
     
-    telegram = TelegramClient(session, api_id, api_hash, proxy=proxy).start()
 
     # get symbol info
     symbol_info = client.get_symbol_info(selectedSymbol)

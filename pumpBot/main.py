@@ -223,12 +223,13 @@ if __name__ == "__main__":
     print(stylize(get_symbol_name(selectedSymbol) + " BALANCE: " +
                   str(selectedSymbolBalance), colored.fg("blue")))
 
-    precision = len(str(step_size)[2:])
+    pres = len(str(step_size)[2:])
 
-    if precision == 1:
-        precision = 0
+    if pres == 1:
+        pres = 0
+
     quantity = round(Decimal(quantity) -
-                     ((Decimal(quantity) * 5) / 100), precision)
+                     ((Decimal(quantity) * 5) / 100), pres)
     #order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
     #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
@@ -247,7 +248,7 @@ if __name__ == "__main__":
 
     selectedSymbolBalance = quantity
     selectedSymbolBalance = round(
-        Decimal(quantity) - ((Decimal(quantity) * 5) / 100), precision)
+        Decimal(quantity) - ((Decimal(quantity) * 5) / 100), pres)
 
     print(stylize("BALANCES", colored.fg("yellow")))
     print(stylize("BTC BALANCE: " + str(btcBalance), colored.fg("blue")))

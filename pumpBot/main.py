@@ -221,7 +221,6 @@ if __name__ == "__main__":
             
             order = client.create_order(symbol=selectedSymbol,side="SELL",type="STOP_LOSS_LIMIT",quantity=selectedSymbolBalance,price=price,stopPrice=p,timeInForce="GTC")
             orderId = order["orderId"]
-            break
             
         if orderId > 0:
             order = client.get_order(symbol=selectedSymbol,orderId=orderId)

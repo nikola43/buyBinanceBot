@@ -243,8 +243,8 @@ if __name__ == "__main__":
 
     selectedSymbolStopLossPrice = round(Decimal(selectedSymbolInitialBuyPrice) - (round(
         Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * stopLossPercent / 100, 8)
-    selectedSymbolSellPrice = floatPrecision(str(round(Decimal(selectedSymbolInitialBuyPrice) + (
-        Decimal(selectedSymbolInitialBuyPrice) * Decimal(takeProfitPercent)) / 100, 8)), tick_size)
+    selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (
+        Decimal(selectedSymbolInitialBuyPrice) * Decimal(takeProfitPercent)) / 100, 8)
 
     selectedSymbolBalance = quantity
     selectedSymbolBalance = round(

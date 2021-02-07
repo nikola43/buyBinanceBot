@@ -150,7 +150,7 @@ selectedSymbolInitialBuyPrice = 0.0
 btcBalance = 0.0
 selectedSymbolBalance = 0.0
 stopLossPercent = 1  # 3%
-takeProfitPercent = 1  # 1%
+takeProfitPercent = 0.5  # 1%
 baseAssetPrecision = 0.0
 order = None
 buy = False
@@ -243,8 +243,8 @@ if __name__ == "__main__":
 
     selectedSymbolStopLossPrice = round(Decimal(selectedSymbolInitialBuyPrice) - (round(
         Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * stopLossPercent / 100, 8)
-    selectedSymbolSellPrice = round(Decimal(selectedSymbolInitialBuyPrice) + (round(
-        Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8)) * takeProfitPercent / 100, 8)
+    selectedSymbolSellPrice = floatPrecision(str(round(Decimal(selectedSymbolInitialBuyPrice) + (
+        Decimal(selectedSymbolInitialBuyPrice) * Decimal(takeProfitPercent)) / 100, 8)), tick_size)
 
     selectedSymbolBalance = quantity
     selectedSymbolBalance = round(

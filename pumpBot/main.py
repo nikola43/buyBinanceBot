@@ -156,7 +156,7 @@ selectedSymbolInitialBuyPrice = 0.0
 btcBalance = 0.0
 selectedSymbolBalance = 0.0
 stopLossPercent = 1  # 3%
-takeProfitPercent = 0.2  # 1%
+takeProfitPercent = 0.6  # 1%
 baseAssetPrecision = 0.0
 order = None
 buy = False
@@ -281,31 +281,34 @@ if __name__ == "__main__":
             selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
             if float(price) > float(selectedSymbolInitialBuyPrice) and float(price) > float(selectedSymbolLastPrice):
-                print(stylize("New price target: " +
-                              str(selectedSymbolSellPrice), colored.fg("yellow")))
-                selectedSymbolLastPrice = price
-                selectedSymbolSellPrice = floatPrecision(round(Decimal(
-                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.20) / 100, 8), tick_size)
-                stopPrice = floatPrecision(
-                    str(round(Decimal(price) - (Decimal(price) * Decimal(0.4)) / 100, 8)), tick_size)
-                print("price " + str(selectedSymbolSellPrice))
-                print("stopPrice " + stopPrice)
+                takeProfitPrice = round(
+                    Decimal(price) + (Decimal(price) * Decimal(takeProfitPercent)) / 100, 8)
+                if float(price) > takeProfitPrice:
+                    print(stylize("New price target: " +
+                                  str(selectedSymbolSellPrice), colored.fg("yellow")))
+                    selectedSymbolLastPrice = price
+                    selectedSymbolSellPrice = floatPrecision(round(Decimal(
+                        price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.2) / 100, 8), tick_size)
+                    stopPrice = floatPrecision(
+                        str(round(Decimal(price) - (Decimal(price) * Decimal(0.3)) / 100, 8)), tick_size)
+                    print("price " + str(selectedSymbolSellPrice))
+                    print("stopPrice " + stopPrice)
 
-                print(stopPrice)
+                    print(stopPrice)
 
-                try:
-                    if (order != None):
-                        o = client.get_order(
-                            symbol=selectedSymbol, orderId=order["orderId"])
+                    try:
+                        if (order != None):
+                            o = client.get_order(
+                                symbol=selectedSymbol, orderId=order["orderId"])
 
-                        client.cancel_order(
-                            symbol=selectedSymbol, orderId=order["orderId"])
-                        print(stylize("order cancelated", colored.fg("red")))
-                except:
-                    print("Not found!")
+                            client.cancel_order(
+                                symbol=selectedSymbol, orderId=order["orderId"])
+                            print(stylize("order cancelated", colored.fg("red")))
+                    except:
+                        print("Not found!")
 
-                order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
-                                            quantity=selectedSymbolBalance, price=stopPrice, stopPrice=str(selectedSymbolSellPrice), timeInForce="GTC")
+                    order = client.create_order(symbol=selectedSymbol, side="SELL", type="STOP_LOSS_LIMIT",
+                                                quantity=selectedSymbolBalance, price=stopPrice, stopPrice=str(selectedSymbolSellPrice), timeInForce="GTC")
 
             try:
                 if (order != None):

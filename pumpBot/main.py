@@ -284,8 +284,8 @@ if __name__ == "__main__":
                 print(stylize("New price target: " +
                               str(selectedSymbolSellPrice), colored.fg("yellow")))
                 selectedSymbolLastPrice = price
-                selectedSymbolSellPrice = round(Decimal(
-                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.15) / 100, 8)
+                selectedSymbolSellPrice = floatPrecision(round(Decimal(
+                    price) - (round(Price.fromstring(price).amount, 8)) * Decimal(0.15) / 100, 8), tick_size)
                 stopPrice = floatPrecision(
                     str(round(Decimal(price) - (Decimal(price) * Decimal(0.2)) / 100, 8)), tick_size)
                 print("price " + str(selectedSymbolSellPrice))

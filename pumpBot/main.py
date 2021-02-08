@@ -85,17 +85,21 @@ def get_symbol_ask_bid_price(tickers, symbol_name, base_asset_precision):
 
 
 def print_take_profit_result(quantity, buy_price, sell_price):
+    cost = float(quantity) * float(buy_price)
+    ben = float(quantity) * float(sell_price)
+    print(cost)
+    print(ben)
+    profit = ben - cost
     print(stylize("Take Profit Sell ", colored.fg("green")))
     print(stylize("Quantity: " + str(quantity), colored.fg("green")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("green")))
     print(stylize(
-        "Profit: " + str((float(quantity) * float(sell_price)) -
-                         (float(quantity) * float(buy_price))) + " BTC",
+        "Profit: " + str(profit) + " BTC",
         colored.fg("green")))
     print("")
 
 
-def print_stop_loss_result(quantity, sell_price):
+def print_stop_loss_result(quantity, buy_price, sell_price):
     print(stylize("Stop Loss Sell ", colored.fg("red")))
     print(stylize("Quantity: " + str(quantity), colored.fg("red")))
     print(stylize("Sell Price: " + str(sell_price), colored.fg("red")))
@@ -175,7 +179,7 @@ def make_initial_buy():
 # Use https://regexone.com/ if you want a more interactive way of learning.
 #
 # "(?i)" makes it case-insensitive, and | separates "options".
-@telegram.on(events.NewMessage())  # pattern=r'(?i).*\b(hello|hi)\b'))
+@ telegram.on(events.NewMessage())  # pattern=r'(?i).*\b(hello|hi)\b'))
 async def handler(event):
     sender = await event.get_sender()
 
@@ -188,8 +192,8 @@ async def handler(event):
     # client.get_input_entity(PeerChannel(fwd.from_id))
     # channel = await event.get_channel()
 
-    #group = event.group()
-    #group = event.get_group()
+    # group = event.group()
+    # group = event.get_group()
     # print(group)
     # print(utils.get_peer_id(sender))
     # print(utils.get_input_location(sender))
@@ -232,8 +236,8 @@ if __name__ == "__main__":
 
     quantity = round(Decimal(quantity) -
                      ((Decimal(quantity) * 5) / 100), pres)
-    #order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
-    #client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
+    # order = client.order_limit_buy(symbol=selectedSymbol, quantity=quantity, price=price)
+    # client.cancel_order(symbol=selectedSymbol, orderId=order["orderId"])
 
     order = client.order_market_buy(symbol=selectedSymbol, quantity=quantity)
     print(order)
@@ -346,11 +350,11 @@ if __name__ == "__main__":
                     p = floatPrecision(p, tick_size)
                     # print(p)
 
-                    #order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
-                    #order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=p)
+                    # order = client.order_market_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance)
+                    # order = client.order_limit_sell(symbol=selectedSymbol, quantity=selectedSymbolBalance, price=p)
                     # print_take_profit_result(selectedSymbolBalance,p)
                     # break
 
-            ##selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
+            # selectedSymbolLastPrice = round(selectedSymbolBidPrice, 8)
             time.sleep(0.5)
     telegram.disconnect()

@@ -281,7 +281,7 @@ if __name__ == "__main__":
             selectedSymbolMinLotSize = get_symbol_minimum_quantity(symbol_info)
 
             if float(price) > float(selectedSymbolInitialBuyPrice) and float(price) > float(selectedSymbolLastPrice):
-                if float(price) > selectedSymbolSellPrice:
+                if float(price) > float(selectedSymbolSellPrice):
                     print(stylize("New price target: " +
                                   str(selectedSymbolSellPrice), colored.fg("yellow")))
                     selectedSymbolLastPrice = price

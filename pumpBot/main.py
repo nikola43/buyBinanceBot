@@ -336,11 +336,12 @@ if __name__ == "__main__":
 
                 order = client.order_market_sell(
                     symbol=selectedSymbol, quantity=selectedSymbolBalance)
-                print_stop_loss_result(quantity, selectedSymbolStopLossPrice)
+                print_stop_loss_result(
+                    quantity, selectedSymbolInitialBuyPrice, selectedSymbolStopLossPrice)
                 break
 
             # TAKE PROFIT SELL
-            if round(Decimal(price), 8) <= selectedSymbolSellPrice:
+            if round(Decimal(price), 8) <= float(selectedSymbolSellPrice):
                 if round(Decimal(price), 8) > round(Price.fromstring(selectedSymbolInitialBuyPrice).amount, 8):
                     print(quantity)
                     p = round(Price.fromstring(

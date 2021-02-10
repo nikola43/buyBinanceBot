@@ -25,9 +25,9 @@ async def handler(event):
     # sender = await event.get_sender()
     print(stylize("said", colored.fg("red")))
     print(stylize(event.text, colored.fg("red")))
-    print(stylize("coin: " + coin, colored.fg("red")))
+    #print(stylize("coin: " + coin, colored.fg("red")))
 
-    if coin is not None:
+    if coin is not None and coin.find("🚀 The Coin is"):
         f = open("asset.txt", "w")
         f.write(coin)
         f.close()

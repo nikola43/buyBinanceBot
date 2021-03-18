@@ -182,8 +182,8 @@ if __name__ == "__main__":
             order = client.create_order(symbol=symbol_info,
                                         side="SELL",
                                         type="STOP_LOSS_LIMIT",
-                                        quantity=sell_quantity,
-                                        price=target_sell_stop_price,
+                                        quantity=Decimal(sell_quantity),
+                                        price=str(target_sell_stop_price),
                                         stopPrice=str(target_sell_price),
                                         timeInForce="GTC")
 

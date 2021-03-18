@@ -179,7 +179,7 @@ if __name__ == "__main__":
             print("price " + str(target_sell_price))
 
             cancel_order(order)
-            order = client.create_order(symbol=symbol_info,
+            order = client.create_order(symbol=symbol,
                                         side="SELL",
                                         type="STOP_LOSS_LIMIT",
                                         quantity=Decimal(sell_quantity),
@@ -190,14 +190,14 @@ if __name__ == "__main__":
         # STOP LOSS 5%
         if current_price <= stop_loss_price:
             cancel_order(order)
-            order = client.order_market_sell(symbol=symbol, quantity=sell_quantity)
+            order = client.order_market_sell(symbol=symbol, quantity=Decimal(sell_quantity))
             print("STOP LOSS")
             exit(0)
 
         # TAKE MAX PROFIT
         if current_price > initial_buy_price + ((initial_buy_price * max_profit_percent) / 100):
             cancel_order(order)
-            order = client.order_market_sell(symbol=symbol, quantity=sell_quantity)
+            order = client.order_market_sell(symbol=symbol, quantity=Decimal(sell_quantity))
             print("TAKE MAX PROFIT")
             exit(0)
 

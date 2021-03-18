@@ -153,7 +153,7 @@ if __name__ == "__main__":
     print(stop_loss_price)
     print("")
 
-    initial_buy_price = initial_price
+    initial_buy_price = 1.02
     high_price = initial_buy_price
     print("sell_quantity")
     print(sell_quantity)
@@ -163,7 +163,7 @@ if __name__ == "__main__":
         symbol_info = client.get_symbol_info(symbol)
         current_price = float(list(filter(
             lambda x: x['symbol'] == symbol, client.get_all_tickers()))[0]['price'])
-        stop_loss_price = float(round(float(current_price) - (float(current_price) * stop_loss_percent), 8))
+        # stop_loss_price = float(round(float(current_price) - (float(current_price) * stop_loss_percent), 8))
         tick_size = float(list(filter(
             lambda f: f['filterType'] == 'PRICE_FILTER', symbol_info['filters']))[0]['tickSize'])
         step_size = float(list(filter(
@@ -179,13 +179,14 @@ if __name__ == "__main__":
             print("price " + str(target_sell_price))
 
             cancel_order(order)
-            order = client.create_test_order(symbol=symbol_info,
-                                             side="SELL",
-                                             type="STOP_LOSS_LIMIT",
-                                             quantity=sell_quantity,
-                                             price=target_sell_stop_price,
-                                             stopPrice=str(target_sell_price),
-                                             timeInForce="GTC")
+            order = client.create_order(symbol=symbol_info,
+                                        side="SELL",
+                                        type="STOP_LOSS_LIMIT",
+                                        quantity=sell_quantity,
+                                        price=target_sell_stop_price,
+                                        stopPrice=str(target_sell_price),
+                                        timeInForce="GTC")
+
         # STOP LOSS 5%
         if current_price <= stop_loss_price:
             cancel_order(order)

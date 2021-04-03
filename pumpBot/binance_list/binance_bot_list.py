@@ -101,7 +101,7 @@ secret = 'UZggnxZ7moBpHw74iGK9SkXHlnci6RAsajO7x1wptsGvgr2qs5lRNu6y5WvJZvDJ'
 client = Client(apikey, secret)
 buy = False
 symbol_name = "eth"
-symbol = symbol_name.upper() + "BTC"
+symbol = symbol_name.upper() + "USDT"
 max_profit_percent = 100
 
 pres = 0
@@ -112,11 +112,11 @@ if __name__ == "__main__":
         coin = check_coin()
         if coin is not None:
             print(coin)
-            symbol = coin.upper() + "BTC"
+            symbol = coin.upper() + "USDT"
             webbrowser.open("https://www.binance.com/es/trade/" + coin.upper() + "_BTC?layout=pro", new=2)
             break
 
-    btc_balance = price_from_string(client.get_asset_balance(asset="BTC")['free'])
+    btc_balance = price_from_string(client.get_asset_balance(asset="USDT")['free'])
     selected_symbol_balance = price_from_string(client.get_asset_balance(asset=coin.upper())['free'])
 
     print("btcBalance")
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     print(stop_loss_price)
     print("")
 
-    initial_buy_price = price_from_string("0.00002144")
+    initial_buy_price = price_from_string("0.00002152")
 
     print(initial_buy_price)
     high_price = initial_buy_price
@@ -187,8 +187,8 @@ if __name__ == "__main__":
         if current_price > initial_buy_price and current_price > high_price:
             high_price = current_price
             print(stylize("New price target: " + str(current_price), colored.fg("yellow")))
-            target_sell_price = float(round(float(current_price) - (float(current_price) * 0.01), 8))
-            target_sell_stop_price = float(round(float(current_price) - (float(current_price) * 0.02), 8))
+            target_sell_price = float(round(float(current_price) - (float(current_price) * 0.1), 8))
+            target_sell_stop_price = float(round(float(current_price) - (float(current_price) * 0.15), 8))
             print("price " + str(target_sell_price))
 
             print("order[orderId]")
@@ -209,6 +209,7 @@ if __name__ == "__main__":
             orderId = order["orderId"]
             print("order[orderId]")
             print(order["orderId"])
+
         # STOP LOSS 5%
         if current_price <= stop_loss_price:
             cancel_order(orderId)
@@ -217,11 +218,11 @@ if __name__ == "__main__":
             exit(0)
 
         # TAKE MAX PROFIT
-        if current_price > initial_buy_price + ((initial_buy_price * max_profit_percent) / 100):
-            cancel_order(orderId)
-            order = client.order_market_sell(symbol=symbol, quantity=decimal.Decimal(sell_quantity))
-            print("TAKE MAX PROFIT")
-            exit(0)
+        #if current_price > initial_buy_price + ((initial_buy_price * max_profit_percent) / 100):
+        #    cancel_order(orderId)
+        #    order = client.order_market_sell(symbol=symbol, quantity=decimal.Decimal(sell_quantity))
+        #    print("TAKE MAX PROFIT")
+        #    exit(0)
 
         print_current_status(current_price,
                              last_price,
